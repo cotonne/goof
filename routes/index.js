@@ -1,12 +1,12 @@
-var utils    = require('../utils');
+// var utils    = require('../utils');
 var mongoose = require('mongoose');
-var Todo     = mongoose.model('Todo');
-var User     = mongoose.model('User');
+var Todo = mongoose.model('Todo');
+var User = mongoose.model('User');
 // TODO:
 var hms = require('humanize-ms');
 var ms = require('ms');
-var streamBuffers = require('stream-buffers');
-var readline = require('readline');
+// var streamBuffers = require('stream-buffers');
+// var readline = require('readline');
 var moment = require('moment');
 var exec = require('child_process').exec;
 
@@ -15,24 +15,21 @@ var fileType = require('file-type');
 var AdmZip = require('adm-zip');
 
 exports.index = function (req, res, next) {
-  Todo.
-    find({}).
-    sort('-updated_at').
-    exec(function (err, todos) {
-      if (err) return next(err);
+  Todo.find({}).sort('-updated_at').exec(function (err, todos) {
+    if (err) return next(err);
 
-      res.render('index', {
-        title: 'Goof TODO',
-        subhead: 'Vulnerabilities at their best',
-        todos: todos,
-      });
+    res.render('index', {
+      title: 'Goof TODO',
+      subhead: 'Vulnerabilities at their best',
+      todos: todos,
     });
+  });
 };
 
 
-exports.admin = function (req, res, next) {
+exports.admin = function (req, res) {
   console.log(req.body);
-  User.find({ username: req.body.username, password: req.body.password }, function (err, users) {
+  User.find({username: req.body.username, password: req.body.password}, function (err, users) {
     if (users.length > 0) {
       return res.render('admin', {
         title: 'Admin Access Granted',
@@ -63,7 +60,7 @@ function parse(todo) {
 
     // remove it
     t = t.slice(0, reminder);
-    if (typeof period != 'undefined') {
+    if (typeof period !== 'undefined') {
       t += ' [' + ms(period) + ']';
     }
   }
@@ -74,8 +71,8 @@ exports.create = function (req, res, next) {
   // console.log('req.body: ' + JSON.stringify(req.body));
 
   var item = req.body.content;
-  var imgRegex = /\!\[alt text\]\((http.*)\s\".*/;
-  if (typeof(item) == 'string' && item.match(imgRegex)) {
+  var imgRegex = /!\[alt text]\((http.*)\s".*/;
+  if (typeof(item) === 'string' && item.match(imgRegex)) {
     var url = item.match(imgRegex)[1];
     console.log('found img: ' + url);
 
@@ -91,9 +88,9 @@ exports.create = function (req, res, next) {
   }
 
   new Todo({
-      content: item,
-      updated_at: Date.now(),
-    }).save(function (err, todo, count) {
+    content: item,
+    updated_at: Date.now(),
+  }).save(function (err, todo) {
     if (err) return next(err);
 
     /*
@@ -112,37 +109,35 @@ exports.destroy = function (req, res, next) {
   Todo.findById(req.params.id, function (err, todo) {
 
     try {
-      todo.remove(function (err, todo) {
+      todo.remove(function (err) {
         if (err) return next(err);
         res.redirect('/');
-  	});
-  } catch(e) {
-  }
+      });
+    } catch (e) {
+      //
+    }
   });
 };
 
-exports.edit = function(req, res, next) {
-  Todo.
-    find({}).
-    sort('-updated_at').
-    exec(function (err, todos) {
-      if (err) return next(err);
+exports.edit = function (req, res, next) {
+  Todo.find({}).sort('-updated_at').exec(function (err, todos) {
+    if (err) return next(err);
 
-      res.render('edit', {
-        title   : 'TODO',
-        todos   : todos,
-        current : req.params.id
-      });
+    res.render('edit', {
+      title: 'TODO',
+      todos: todos,
+      current: req.params.id
     });
+  });
 };
 
-exports.update = function(req, res, next) {
+exports.update = function (req, res, next) {
   Todo.findById(req.params.id, function (err, todo) {
 
-    todo.content    = req.body.content;
+    todo.content = req.body.content;
     todo.updated_at = Date.now();
-    todo.save(function (err, todo, count) {
-      if(err) return next(err);
+    todo.save(function (err) {
+      if (err) return next(err);
 
       res.redirect('/');
     });
@@ -168,18 +163,18 @@ exports.import = function (req, res, next) {
   var importFile = req.files.importFile;
   var data;
   var importedFileType = fileType(importFile.data);
-  var zipFileExt = { ext: "zip", mime: "application/zip" };
+  var zipFileExt = {ext: 'zip', mime: 'application/zip'};
   if (importedFileType === null) {
-    importedFileType = { ext: "txt", mime: "text/plain" };
+    importedFileType = {ext: 'txt', mime: 'text/plain'};
   }
-  if (importedFileType["mime"] === zipFileExt["mime"]) {
+  if (importedFileType['mime'] === zipFileExt['mime']) {
     var zip = AdmZip(importFile.data);
-    var extracted_path = "/tmp/extracted_files";
+    var extracted_path = '/tmp/extracted_files';
     zip.extractAllTo(extracted_path, true);
     var zipEntries = zip.getEntries();
-    data = "No backup.txt file found";
+    data = 'No backup.txt file found';
     zipEntries.forEach(function (zipEntry) {
-      if (zipEntry.entryName === "backup.txt") {
+      if (zipEntry.entryName === 'backup.txt') {
         data = zipEntry.getData().toString('ascii');
       }
     });
@@ -207,7 +202,7 @@ exports.import = function (req, res, next) {
       new Todo({
         content: item,
         updated_at: Date.now(),
-      }).save(function (err, todo, count) {
+      }).save(function (err, todo) {
         if (err) return next(err);
         console.log('added ' + todo);
       });
@@ -217,12 +212,12 @@ exports.import = function (req, res, next) {
   res.redirect('/');
 };
 
-exports.about_new = function (req, res, next) {
-    console.log(JSON.stringify(req.query));
-    return res.render("about_new.dust",
-      {
-        title: 'Goof TODO',
-        subhead: 'Vulnerabilities at their best',
-        device: req.query.device
-      });
+exports.about_new = function (req, res) {
+  console.log(JSON.stringify(req.query));
+  return res.render('about_new.dust',
+    {
+      title: 'Goof TODO',
+      subhead: 'Vulnerabilities at their best',
+      device: req.query.device
+    });
 };

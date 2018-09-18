@@ -6,7 +6,7 @@
 require('./db');
 
 var st             = require('st');
-var crypto         = require('crypto');
+// var crypto         = require('crypto');
 var express        = require('express');
 var http           = require('http');
 var path           = require('path');
@@ -16,10 +16,10 @@ var bodyParser     = require('body-parser');
 var methodOverride = require('method-override');
 var logger         = require('morgan');
 var errorHandler   = require('errorhandler');
-var optional       = require('optional');
+// var optional       = require('optional');
 var marked         = require('marked');
 var fileUpload     = require('express-fileupload');
-var dust           = require('dustjs-linkedin');
+// var dust           = require('dustjs-linkedin');
 var dustHelpers   = require('dustjs-helpers');
 var cons           = require('consolidate');
 
@@ -59,7 +59,7 @@ marked.setOptions({ sanitize: true });
 app.locals.marked = marked;
 
 // development only
-if (app.get('env') == 'development') {
+if (app.get('env') === 'development') {
   app.use(errorHandler());
 }
 
