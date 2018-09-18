@@ -73,7 +73,7 @@ pipeline {
 
         stage('NoSqlMap') {
          steps {
-           sh "python2 /var/nosqlmap/NoSQLMap-master/nosqlmap.py --attack=2 --victim=${env.HOST} --webPort=${env.PORT} --uri='/?q=' --injectSize=1000 --injectFormat=1 --params=1 --doTimeAttack=n --injectedParameter=2"
+           sh "python2 /var/nosqlmap/NoSQLMap-master/nosqlmap.py --attack=2 --victim=${env.HOST} --webPort=${env.PORT} --uri='/?q=' --injectSize=1000 --injectFormat=1 --params=1 --doTimeAttack=n --httpMethod POST --postData 'content,test' --injectedParameter 1"
            step([$class: 'LogParserPublisher', useProjectRule: true, projectRulePath: 'jenkins-rule-logparser'])
          }
        }
