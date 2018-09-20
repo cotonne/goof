@@ -34,7 +34,7 @@ pipeline {
            script {
              RES = sh (script: 'npm audit > audit.log', returnStatus: true)
              echo "RES = ${RES}"
-             message = readFile('audit.log).split('\n').find {it.matches('found.*vulnerabilities.*')}
+             message = readFile('audit.log').split("\n").find {it.matches('found.*vulnerabilities.*')}
              echo message
            }
         }
