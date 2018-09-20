@@ -32,10 +32,11 @@ pipeline {
        stage('Audit') {
          steps {
            script {
-             RES = sh (script: 'npm audit', returnStatus: true)
+             RES = sh (script: 'npm audit > audit.log', returnStatus: true)
              echo "RES = ${RES}"
+             message = readFile('audit.log).split('\n').find {it.matches('found.*vulnerabilities.*')}
+             echo message
            }
-           step([$class: 'LogParserPublisher', projectRulePath: 'jenkins-rules-logparser-audit', unstableOnWarning: true, useProjectRule: true])
         }
        }
  
@@ -74,7 +75,6 @@ pipeline {
         stage('NoSqlMap') {
          steps {
            sh "python2 /var/nosqlmap/NoSQLMap-master/nosqlmap.py --attack=2 --victim=${env.HOST} --webPort=${env.PORT} --uri='/create' --injectSize=1000 --injectFormat=1 --params=1 --doTimeAttack=n --httpMethod POST --postData 'content,test' --injectedParameter 1"
-           step([$class: 'LogParserPublisher', useProjectRule: true, projectRulePath: 'jenkins-rule-logparser'])
          }
        }
     
