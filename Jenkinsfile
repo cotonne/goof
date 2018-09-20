@@ -32,7 +32,7 @@ pipeline {
        stage('Audit') {
          steps {
            script {
-             RES = sh (script: 'npm audit', returnStdout: true)
+             RES = sh (script: 'npm audit', returnStatus: true)
              echo "RES = ${RES}"
            }
            step([$class: 'LogParserPublisher', projectRulePath: 'jenkins-rules-logparser-audit', unstableOnWarning: true, useProjectRule: true])
